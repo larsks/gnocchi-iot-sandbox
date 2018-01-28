@@ -4,7 +4,7 @@ endpoint=$1
 jsonfile=$2
 shift 2
 
-id=$(uuidgen)
+: ${id:=$(uuidgen)}
 export id
 
 curl localhost:8041/v1/"$endpoint" \
