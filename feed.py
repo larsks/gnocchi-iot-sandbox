@@ -48,7 +48,7 @@ with open(args.input) as fd:
     cache = {}
     measures = {}
     measure_count = 0
-    total_count  = 0
+    total_count = 0
     for row in reader:
         timestamp = row[0]
         fields = json.loads(row[2])
@@ -56,26 +56,15 @@ with open(args.input) as fd:
 
         macaddr = fields['sensor_id']
 
-        if macaddr not in cache:
-            r = requests.post(
-                'http://localhost:8041/v1/search/resource/dhtsensor',
-                headers={'content-type': 'application/json'},
-                auth=HTTPBasicAuth('admin', ''),
-                data=json.dumps({'=': {'macaddr': macaddr}}))
-            r.raise_for_status()
-            cache[macaddr] = r.json()[0]
-
-        resource = cache[macaddr]
-
-        if resource['id'] not in measures:
-            measures[resource['id']] = {}
+        if macaddr not in measures:
+            measures[macaddr] = {}
         for name, value in values.items():
-            name = 'sensor.dht.{}'.format(name)
-            if name in resource['metrics']:
-                if name not in measures[resource['id']]:
-                    measures[resource['id']][name] = []
+            if name in ['temperature', 'humidity']:
+                name = 'sensor.dht.{}'.format(name)
+                if name not in measures[macaddr]:
+                    measures[macaddr][name] = []
 
-                measures[resource['id']][name].append({
+                measures[macaddr][name].append({
                     'timestamp': timestamp,
                     'value': value,
                 })
