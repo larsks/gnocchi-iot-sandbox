@@ -20,6 +20,26 @@ def parse_args():
     return p.parse_args()
 
 
+def send_measures():
+    global measure_count
+    global measures
+
+    with open('measure.log', 'a') as fd:
+        json.dump(measures, fd, indent=2)
+        fd.write('\n')
+
+    LOG.info('sending %d metrics', measure_count)
+    r = requests.post(
+        'http://localhost:8041/v1/batch/resources/metrics/measures',
+        headers={'content-type': 'application/json'},
+        auth=HTTPBasicAuth('admin', ''),
+        data=json.dumps(measures))
+    r.raise_for_status()
+
+    measure_count = 0
+    measures = {}
+
+
 args = parse_args()
 
 with open(args.input) as fd:
@@ -48,7 +68,7 @@ with open(args.input) as fd:
         resource = cache[macaddr]
 
         if resource['id'] not in measures:
-            measures = {resource['id']: {}}
+            measures[resource['id']] = {}
         for name, value in values.items():
             name = 'sensor.dht.{}'.format(name)
             if name in resource['metrics']:
@@ -63,21 +83,6 @@ with open(args.input) as fd:
                 measure_count += 1
                 total_count += 1
                 if measure_count % args.batchsize == 0:
-                    LOG.info('sending %d metrics', measure_count)
-                    r = requests.post(
-                        'http://localhost:8041/v1/batch/resources/metrics/measures',
-                        headers={'content-type': 'application/json'},
-                        auth=HTTPBasicAuth('admin', ''),
-                        data=json.dumps(measures))
-                    r.raise_for_status()
+                    send_measures()
 
-                    measure_count = 0
-                    measures = {}
-
-    LOG.info('sending %d metrics', measure_count)
-    r = requests.post(
-        'http://localhost:8041/v1/batch/resources/metrics/measures',
-        headers={'content-type': 'application/json'},
-        auth=HTTPBasicAuth('admin', ''),
-        data=json.dumps(measures))
-    r.raise_for_status()
+    send_measures()
