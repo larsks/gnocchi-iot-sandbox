@@ -1,0 +1,14 @@
+#!/bin/bash
+
+endpoint=$1
+jsonfile=$2
+shift 2
+
+id=$(uuidgen)
+export id
+
+curl localhost:8041/v1/"$endpoint" \
+	--trace-ascii log \
+	-u admin: \
+	-H 'Content-type: application/json' \
+	-d @<(envsubst < "${jsonfile}") "$@"

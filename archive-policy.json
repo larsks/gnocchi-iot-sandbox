@@ -1,0 +1,18 @@
+{
+  "back_window": 0,
+  "definition": [
+    {
+      "granularity": "1m",
+      "timespan": "30 day"
+    },
+    {
+      "granularity": "10m",
+      "timespan": "180 day"
+    },
+    {
+      "granularity": "30m",
+      "timespan": "3650 day"
+    }
+  ],
+  "name": "sensors"
+}

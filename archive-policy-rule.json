@@ -1,0 +1,5 @@
+{
+  "archive_policy_name": "sensors",
+  "metric_pattern": "sensor.*",
+  "name": "sensor_rule"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "$name",
+  "macaddr": "$macaddr",
+  "id": "$id",
+  "metrics": {
+    "sensor.dht.temperature": {},
+    "sensor.dht.humidity": {}
+  }
+}
