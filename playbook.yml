@@ -55,6 +55,8 @@
       changed_when: result.status == 201
 
     - name: "create devices"
+      tags:
+        - devices
       uri:
         url: "{{ gnocchi_endpoint }}/v1/resource/dhtsensor"
         user: admin
