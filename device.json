@@ -1,7 +1,7 @@
 {
-  "name": "$name",
-  "id": "$macaddr",
-  "macaddr": "$macaddr",
+  "name": "{{ item.value }}",
+  "id": "{{ item.key }}",
+  "macaddr": "{{ item.key }}",
   "metrics": {
     "sensor.dht.temperature": {},
     "sensor.dht.humidity": {}

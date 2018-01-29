@@ -1,0 +1,69 @@
+---
+- hosts: localhost
+  gather_facts: false
+  vars:
+    gnocchi_endpoint: http://localhost:8041
+
+    archive_policy_filename: archive-policy.json
+    archive_policy: "{{ lookup('file', archive_policy_filename) }}"
+
+    archive_policy_rule_filename: archive-policy-rule.json
+    archive_policy_rule: "{{ lookup('file', archive_policy_rule_filename) }}"
+
+    resource_type_filename: resource-type-dhtsensor.json
+    resource_type: "{{ lookup('file', resource_type_filename) }}"
+
+    devices: "{{ lookup('file', 'devices.yaml')|from_yaml }}"
+  tasks:
+    - name: "configure archive policy"
+      uri:
+        url: "{{ gnocchi_endpoint }}/v1/archive_policy"
+        user: admin
+        password: admin
+        force_basic_auth: true
+        method: POST
+        body_format: json
+        body: "{{ archive_policy }}"
+        status_code: 201,409
+      register: result
+      changed_when: result.status == 201
+
+    - name: "configure archive policy rule"
+      uri:
+        url: "{{ gnocchi_endpoint }}/v1/archive_policy_rule"
+        user: admin
+        password: admin
+        force_basic_auth: true
+        method: POST
+        body_format: json
+        body: "{{ archive_policy_rule }}"
+        status_code: 201,409
+      register: result
+      changed_when: result.status == 201
+
+    - name: "create dhtsensor resource type"
+      uri:
+        url: "{{ gnocchi_endpoint }}/v1/resource_type"
+        user: admin
+        password: admin
+        force_basic_auth: true
+        method: POST
+        body_format: json
+        body: "{{ resource_type }}"
+        status_code: 201,409
+      register: result
+      changed_when: result.status == 201
+
+    - name: "create devices"
+      uri:
+        url: "{{ gnocchi_endpoint }}/v1/resource/dhtsensor"
+        user: admin
+        password: admin
+        force_basic_auth: true
+        method: POST
+        body_format: json
+        body: "{{ lookup('template', 'device.json') }}"
+        status_code: 201,409
+      register: result
+      changed_when: result.status == 201
+      with_dict: "{{ devices }}"
